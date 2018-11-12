@@ -1,3 +1,7 @@
+Line.destroy_all
+Station.destroy_all
+Stop.destroy_all
+
 piccadilly = Line.create(name: "Piccadilly", colour: "purple")
 northern = Line.create(name: "Northern", colour: "black")
 central = Line.create(name: "Central", colour: "red")
