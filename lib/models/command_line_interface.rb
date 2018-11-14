@@ -4,8 +4,6 @@ require 'rainbow'
 
 class CommandLineInterface
 
-
-
   def run
    greet
    intro
@@ -129,7 +127,9 @@ class CommandLineInterface
         stops_hash["#{l}"] = tube_station_names
       end
     end
-    File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
+
+    #File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
+
   end
 
   def read_array
