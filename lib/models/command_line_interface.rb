@@ -1,6 +1,5 @@
 class CommandLineInterface
-require 'rest-client'
-require 'json'
+
 
   def run
    greet
@@ -108,7 +107,9 @@ require 'json'
         stops_hash["#{l}"] = tube_station_names
       end
     end
-    File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
+
+    #File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
+
   end
 
   def read_array
