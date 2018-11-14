@@ -1,7 +1,3 @@
-require 'rest-client'
-require 'json'
-require 'rainbow'
-
 class CommandLineInterface
 
   def run
@@ -15,17 +11,19 @@ class CommandLineInterface
     puts hello.asciify("Mind the Gap")
   end
 
-  def intro
-   puts "Select a number from 1 - 5"
-   puts "---------------------------"
-   puts Rainbow("1|").blue.bright + " To find what stations are in a line"
-   puts Rainbow("2|").blue.bright + " To find what line a station belongs to"
-   puts Rainbow("3|").blue.bright + " To find out the station with the most lines"
-   puts Rainbow("4|").blue.bright + " To find out the station with the least lines"
-   puts Rainbow("5|").blue.bright + " To exit"
+   def intro
+     puts "Select a number from 1 - 7"
+     puts "---------------------------"
+     puts Rainbow("1|").blue.bright + " What stations are on a line?"
+     puts Rainbow("2|").blue.bright + " What lines does a station belong to?"
+     puts Rainbow("3|").blue.bright + " Stations with the most lines"
+     puts Rainbow("4|").blue.bright + " Stations with the least lines"
+     puts Rainbow("5|").blue.bright + " Lines with the most stations"
+     puts Rainbow("6|").blue.bright + " Lines with the least stations"
+     puts Rainbow("7|").blue.bright + " To exit"
   end
 
-  def menu_setting
+   def menu_setting
     input = " "
     while input
       input = gets.chomp
@@ -33,73 +31,89 @@ class CommandLineInterface
         when "1"
           puts "Please enter a line name:"
           line = gets.chomp
-          line.split.map(&:capitalize).join(' ')
+          line = line.split.map(&:capitalize).join(' ')
           find_stations(line)
         when "2"
           puts "Please enter a station name: "
           station = gets.chomp
-          station.split.map(&:capitalize).join(' ')
+          station = station.split.map(&:capitalize).join(' ')
           find_lines(station)
         when "3"
-          puts "Here is a list of the line with the most stations: "
-          most_stations
+          most_lines
         when "4"
-          puts "Here is a list of the line with the least stations: "
-          least_stations
+          least_lines
         when "5"
+          most_stations
+        when "6"
+          least_stations
+        when "7"
           goodbye = Artii::Base.new :font => 'slant'
           puts goodbye.asciify("Have a safe journey")
           break
           else
-          puts "Try again. Please select a number from 1 - 5"
+          puts "Please select a number from 1 - 5"
       end
     end
    end
 
-  def gets_user_input
-    puts "Find out what Line a Station belongs to."
-    puts "Find out what Stations are in a Line."
-    puts "Please enter a station name:"
-    station_name = gets.chomp
-    station_name = station_name.split.map(&:capitalize).join(' ')
-    puts "You are at #{station_name}"
-    station_name
-  end
+   def colour_lines(line_name)
+     line_colors = {
+       Bakerloo: "B36305",
+       Circle: "FFD300",
+       Central: "E32017",
+       District: "00782A",
+       "Hammersmith & City": "F3A9BB",
+       Jubilee: "A0A5A9",
+       Metropolitan: "9B0056",
+       Northern: "000000",
+       Piccadilly: "003688",
+       Victoria: "0098D4",
+       "Waterloo & City": "95CDBA",
+     }
+      Rainbow(line_name.to_sym).bg(line_colors[line_name.to_sym]).white.blink.bright
+   end
 
   def find_lines(station_name)
     lines = []
-    lines = Station.find_by(name: station_name).lines
-    puts "#{station_name} is on the following #{lines.length} line(s):"
-    lines.map{|l| puts " * " + l.name.split.map(&:capitalize).join(' ') + " - " + l.colour}
+    search_results = []
+    search_results = Station.where("name like ?", "#{station_name}%").map{|s| s.name}
+    lines = Station.find_by(name: "#{search_results[0]}").lines
+    puts "#{search_results[0]} is on the following #{lines.length} line(s):"
+    lines.map{|l| puts colour_lines l.name.split.map(&:capitalize).join(' ')}
   end
 
+
   def find_stations(line_name)
-    stations = []
-    stations = Line.find_by(name: line_name).stations
-    puts "#{line_name} line has the following #{stations.length} station(s):"
-    stations.map{|s| puts " * " + s.name.split.map(&:capitalize).join(' ')}
+    stops = []
+    search_results = []
+    search_results = Line.where("name like ?", "#{line_name}%").map{|l| l.name}
+    Line.find_by(name: "#{search_results[0]}").stations
+    stops = Line.find_by(name: "#{search_results[0]}").stations
+    puts "#{colour_lines search_results[0]} line has the following #{stops.length} station(s):"
+    stops.map{|s| puts s.name.split.map(&:capitalize).join(' ')}
+    puts "#{stops.length} station(s) on the #{colour_lines search_results[0]} line!"
+  end
+
+  def most_lines
+    max_num = Station.all.group_by{|s| s.lines.count}.keys.max
+    most_lines = Station.all.group_by{|s| s.lines.count}[max_num].map{|s| s.name}
+    puts "#{most_lines.sample(5).join(", ")} has #{max_num} lines"
+  end
+
+  def least_lines
+    min_num = Station.all.group_by{|s| s.lines.count}.keys.min
+    least_lines = Station.all.group_by{|s| s.lines.count}[min_num].map{|s| s.name}
+    puts "There are #{least_lines.count} stations with just one line."
+    puts "Here is a random list of 5 of them: "
+    puts "#{least_lines.sample(5).join(", ")}"
   end
 
   def most_stations
-    lines = []
-    total_stations = []
-    Line.all.map do |l|
-        lines << Line.find(l.id).stations
-        end
-    total_stations = lines.map {|l| l.length}
-    line = total_stations.index(total_stations.max) + 1
-    puts "#{Line.find(line).name} has the most stations."
+    puts "#{colour_lines Line.find_by(id: Stop.group(:line_id).count.max_by{|k,v| v}[0]).name} line has the most stations."
   end
 
   def least_stations
-    lines = []
-    total_stations = []
-    Line.all.map do |l|
-        lines << Line.find(l.id).stations
-        end
-    total_stations = lines.map {|l| l.length}
-    line = total_stations.index(total_stations.min) + 1
-    puts "#{Line.find(line).name} has the least stations."
+    puts "#{colour_lines Line.find_by(id: Stop.group(:line_id).count.min_by{|k,v| v}[0]).name} line has the least stations."
   end
 
   def get_tfl_line_ids
@@ -127,9 +141,7 @@ class CommandLineInterface
         stops_hash["#{l}"] = tube_station_names
       end
     end
-
     #File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
-
   end
 
   def read_array
