@@ -1,41 +1,62 @@
-class CommandLineInterface
 require 'rest-client'
 require 'json'
+require 'rainbow'
+
+class CommandLineInterface
+
+
 
   def run
    greet
-   puts "**********************"
-   puts "**********************"
-   puts "Select a number from 1 - 4"
-   puts "--------------------------"
-   puts "1 | To find what stations are in a line"
-   puts "2 | To find what line a station belongs to"
-   puts "3 | To find out the station with the most lines"
-   puts "4 | To find out the station with the least lines"
-   input = gets.chomp
-   case input
-   when "1"
-     puts "Please enter a line name:"
-     line = gets.chomp
-     find_stations(line)
-   when "2"
-     puts "Please enter a station name: "
-     station = gets.chomp
-     find_lines(station)
-   when "3"
-     puts "Here is a list of the line with the most stations: "
-     most_stations
-   when "4"
-     puts "Here is a list of the line with the least stations: "
-     least_stations
-   else
-     puts "Please select a number from 1 - 4"
-   end
+   intro
+   menu_setting
   end
 
   def greet
-    puts "Mind the Gap"
+    hello = Artii::Base.new :font => 'slant'
+    puts hello.asciify("Mind the Gap")
   end
+
+  def intro
+   puts "Select a number from 1 - 5"
+   puts "---------------------------"
+   puts Rainbow("1|").blue.bright + " To find what stations are in a line"
+   puts Rainbow("2|").blue.bright + " To find what line a station belongs to"
+   puts Rainbow("3|").blue.bright + " To find out the station with the most lines"
+   puts Rainbow("4|").blue.bright + " To find out the station with the least lines"
+   puts Rainbow("5|").blue.bright + " To exit"
+  end
+
+  def menu_setting
+    input = " "
+    while input
+      input = gets.chomp
+      case input
+        when "1"
+          puts "Please enter a line name:"
+          line = gets.chomp
+          line.split.map(&:capitalize).join(' ')
+          find_stations(line)
+        when "2"
+          puts "Please enter a station name: "
+          station = gets.chomp
+          station.split.map(&:capitalize).join(' ')
+          find_lines(station)
+        when "3"
+          puts "Here is a list of the line with the most stations: "
+          most_stations
+        when "4"
+          puts "Here is a list of the line with the least stations: "
+          least_stations
+        when "5"
+          goodbye = Artii::Base.new :font => 'slant'
+          puts goodbye.asciify("Have a safe journey")
+          break
+          else
+          puts "Try again. Please select a number from 1 - 5"
+      end
+    end
+   end
 
   def gets_user_input
     puts "Find out what Line a Station belongs to."
@@ -51,14 +72,14 @@ require 'json'
     lines = []
     lines = Station.find_by(name: station_name).lines
     puts "#{station_name} is on the following #{lines.length} line(s):"
-    lines.map{|l| puts " * " + l.name + " - " + l.colour.capitalize}
+    lines.map{|l| puts " * " + l.name.split.map(&:capitalize).join(' ') + " - " + l.colour}
   end
 
   def find_stations(line_name)
     stations = []
     stations = Line.find_by(name: line_name).stations
     puts "#{line_name} line has the following #{stations.length} station(s):"
-    stations.map{|s| puts " * " + s.name.capitalize}
+    stations.map{|s| puts " * " + s.name.split.map(&:capitalize).join(' ')}
   end
 
   def most_stations
