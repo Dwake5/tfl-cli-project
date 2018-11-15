@@ -9,7 +9,7 @@ class CommandLineInterface
   def greet
     hello = Artii::Base.new :font => 'slant'
     puts hello.asciify("Mind the Gap")
-    60.times do print "\u{1F687} " end
+    55.times do print "\u{1F687} " end
     puts ""
   end
 
@@ -79,11 +79,19 @@ class CommandLineInterface
       station = station.split.map(&:capitalize).join(' ')
       find_lines(station)
     else
+      puts "****************************"
+      puts "WE FOUND THE FOLLOWING STATIONS:"
+      puts "--------------------------------"
+      puts "#{search_results.map{|r| r}.join("\n")}"
+      puts ""
+      puts "Here is the information about the first one in this list:"
+      puts ""
       lines = Station.find_by(name: "#{search_results[0]}").lines
       puts "\u{1F689} #{search_results[0]} is on the following #{lines.length} line(s): \u{1F689} "
       lines.map{|l| puts colour_lines l.name.split.map(&:capitalize).join(' ')}
-      40.times do print "\u{1F687} " end
-        puts "\n\n\n"
+      30.times do print "\u{1F687} " end
+      puts ""
+      puts "\n **************************** \n\n\n"
       intro
     end
 
@@ -100,13 +108,15 @@ class CommandLineInterface
       line = line.split.map(&:capitalize).join(' ')
       find_stations(line)
     else
+      puts "****************************"
       Line.find_by(name: "#{search_results[0]}").stations
       stops = Line.find_by(name: "#{search_results[0]}").stations
       puts "\u{1F689}  #{colour_lines search_results[0]} line has the following #{stops.length} station(s): \u{1F689} "
       stops.map{|s| puts s.name.split.map(&:capitalize).join(' ')}
       puts "#{stops.length} station(s) on the #{colour_lines search_results[0]} line!"
-      40.times do print "\u{1F687} " end
-        puts "\n\n\n"
+      30.times do print "\u{1F687} " end
+      puts ""
+      puts "\n **************************** \n\n\n"
       intro
     end
   end
@@ -114,34 +124,40 @@ class CommandLineInterface
   def most_lines
     max_num = Station.all.group_by{|s| s.lines.count}.keys.max
     most_lines = Station.all.group_by{|s| s.lines.count}[max_num].map{|s| s.name}
+    puts "****************************"
     puts "\u{1F689}  #{most_lines.sample(5).join(", ")} has #{max_num} lines. \u{1F689}  "
-    40.times do print "\u{1F687} " end
-      puts "\n\n\n"
+    30.times do print "\u{1F687} " end
+    puts ""
+    puts "\n **************************** \n\n\n"
     intro
   end
 
   def least_lines
     min_num = Station.all.group_by{|s| s.lines.count}.keys.min
     least_lines = Station.all.group_by{|s| s.lines.count}[min_num].map{|s| s.name}
+    puts "****************************"
     puts "\u{1F689}  There are #{least_lines.count} stations with just ONE line. \u{1F689}  "
     puts "Here is a random list of 5 of them:"
     puts "\u{1F689}  #{least_lines.sample(5).join("\n \u{1F689}  ")}"
-    40.times do print "\u{1F687} " end
-      puts "\n\n\n"
+    30.times do print "\u{1F687} " end
+    puts ""
+    puts "\n **************************** \n\n\n"
     intro
   end
 
   def most_stations
     puts "\u{1F689}  #{colour_lines Line.find_by(id: Stop.group(:line_id).count.max_by{|k,v| v}[0]).name} line has the most stations. \u{1F689}  "
-    40.times do print "\u{1F687} " end
+    30.times do print "\u{1F687} " end
     puts "\n\n\n"
     intro
   end
 
   def least_stations
+    puts "****************************"
     puts "\u{1F689}  #{colour_lines Line.find_by(id: Stop.group(:line_id).count.min_by{|k,v| v}[0]).name} line has the least stations. \u{1F689}  "
-    40.times do print "\u{1F687} " end
-    puts "\n\n\n"
+    30.times do print "\u{1F687} " end
+    puts ""
+    puts "\n **************************** \n\n\n"
     intro
   end
 
@@ -197,6 +213,7 @@ class CommandLineInterface
           .map{|tfl| tfl["lineStatuses"]}.flatten[0]["statusSeverity"]
         end
     disruptions_hash.each do|line,dis|
+      puts "************************************"
       print "#{colour_lines Line.find_by(tfl_id: line).name} line has "
       if dis[1] < 10 && dis[1] >= 5
         puts Rainbow("#{dis[0].upcase}").black.bg("dbba30").blink
@@ -205,8 +222,9 @@ class CommandLineInterface
       else puts "#{dis[0].upcase}"
       end
     end
-    40.times do print "\u{1F687} " end
-    puts "\n\n\n"
+    30.times do print "\u{1F687} " end
+    puts ""
+    puts "\n **************************** \n\n\n"
     intro
   end
 
