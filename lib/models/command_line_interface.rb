@@ -9,6 +9,8 @@ class CommandLineInterface
   def greet
     hello = Artii::Base.new :font => 'slant'
     puts hello.asciify("Mind the Gap")
+    40.times do print "\u{1F687}" end
+    puts ""
   end
 
    def intro
@@ -20,7 +22,8 @@ class CommandLineInterface
      puts Rainbow("4|").blue.bright + " Stations with the least lines"
      puts Rainbow("5|").blue.bright + " Lines with the most stations"
      puts Rainbow("6|").blue.bright + " Lines with the least stations"
-     puts Rainbow("7|").blue.bright + " To exit"
+     puts Rainbow("7|").blue.bright + " View Disruptions"
+     puts Rainbow("8|").blue.bright + " To exit"
   end
 
    def menu_setting
@@ -47,39 +50,35 @@ class CommandLineInterface
         when "6"
           least_stations
         when "7"
+          disruptions
+        when "8"
           goodbye = Artii::Base.new :font => 'slant'
-          puts goodbye.asciify("Have a safe journey")
+          puts goodbye.asciify("Have a Safe Journey")
           break
           else
-          puts "Please select a number from 1 - 5"
+          puts "Please select a number from 1 - 8"
       end
     end
    end
 
    def colour_lines(line_name)
-     line_colors = {
-       Bakerloo: "B36305",
-       Circle: "FFD300",
-       Central: "E32017",
-       District: "00782A",
-       "Hammersmith & City": "F3A9BB",
-       Jubilee: "A0A5A9",
-       Metropolitan: "9B0056",
-       Northern: "000000",
-       Piccadilly: "003688",
-       Victoria: "0098D4",
-       "Waterloo & City": "95CDBA",
-     }
-      Rainbow(line_name.to_sym).bg(line_colors[line_name.to_sym]).white.blink.bright
+      Rainbow(line_name).bg(Line.find_by(name: line_name).colour).white.blink.bright
    end
 
   def find_lines(station_name)
     lines = []
     search_results = []
     search_results = Station.where("name like ?", "#{station_name}%").map{|s| s.name}
-    lines = Station.find_by(name: "#{search_results[0]}").lines
-    puts "#{search_results[0]} is on the following #{lines.length} line(s):"
-    lines.map{|l| puts colour_lines l.name.split.map(&:capitalize).join(' ')}
+    if search_results.length == 0
+      puts "SORRY! We could not find that station, please try again."
+      station = gets.chomp
+      station = station.split.map(&:capitalize).join(' ')
+      find_lines(station)
+    else
+      lines = Station.find_by(name: "#{search_results[0]}").lines
+      puts "#{search_results[0]} is on the following #{lines.length} line(s):"
+      lines.map{|l| puts colour_lines l.name.split.map(&:capitalize).join(' ')}
+    end
   end
 
 
@@ -87,11 +86,18 @@ class CommandLineInterface
     stops = []
     search_results = []
     search_results = Line.where("name like ?", "#{line_name}%").map{|l| l.name}
-    Line.find_by(name: "#{search_results[0]}").stations
-    stops = Line.find_by(name: "#{search_results[0]}").stations
-    puts "#{colour_lines search_results[0]} line has the following #{stops.length} station(s):"
-    stops.map{|s| puts s.name.split.map(&:capitalize).join(' ')}
-    puts "#{stops.length} station(s) on the #{colour_lines search_results[0]} line!"
+    if search_results.length == 0
+      puts "SORRY! We could not find that line, please try again."
+      line = gets.chomp
+      line = line.split.map(&:capitalize).join(' ')
+      find_stations(line)
+    else
+      Line.find_by(name: "#{search_results[0]}").stations
+      stops = Line.find_by(name: "#{search_results[0]}").stations
+      puts "#{colour_lines search_results[0]} line has the following #{stops.length} station(s):"
+      stops.map{|s| puts s.name.split.map(&:capitalize).join(' ')}
+      puts "#{stops.length} station(s) on the #{colour_lines search_results[0]} line!"
+    end
   end
 
   def most_lines
@@ -117,17 +123,9 @@ class CommandLineInterface
   end
 
   def get_tfl_line_ids
-    ["piccadilly", "northern", "bakerloo", "central", "circle", "district", "hammersmith-city", "jubilee", "metropolitan", "victoria", "waterloo-city"]
-    # puts Line.all.map{|l| l.tfl_id}
-    # TODO REPLACE WITH DATA FROM db
+    # ["piccadilly", "northern", "bakerloo", "central", "circle", "district", "hammersmith-city", "jubilee", "metropolitan", "victoria", "waterloo-city"]
+    Line.all.map{|l| l.tfl_id}
   end
-
-  def get_all_tube_lines
-    # Line.all.map{|l| l.name}
-    # TODO REPLACE WITH DATA FROM db
-    ["Piccadilly", "Northern", "Bakerloo", "Central", "Circle", "District", "Hammersmith & City", "Jubilee", "Metropolitan", "Victoria", "Waterloo & City"]
-  end
-
 
   def get_all_tube_stations
     stops_hash = Hash.new{}
@@ -141,13 +139,48 @@ class CommandLineInterface
         stops_hash["#{l}"] = tube_station_names
       end
     end
-    #File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
+    # File.open("tfl.rb", 'w') { |file| file.write(stops_hash) }
   end
 
-  def read_array
-    lines = ["piccadilly", "northern", "bakerloo", "central", "circle", "district", "hammersmith-city", "jubilee", "metropolitan", "victoria", "waterloo-city"]
-    lines.each do |l|
-      l = File.readlines("#{l}.json")
+  def disruptions
+    disruptions_hash = Hash.new{}
+    url = "https://api.tfl.gov.uk/Line/Mode/tube/Status?detail=true&app_id=7f2f48f4&app_key=0e1550125ac29794e46fe13c38722cf8"
+    response_string = RestClient.get(url)
+    response_hash = JSON.parse(response_string)
+  end
+
+  def disruptions
+    disruptions_hash =
+        {
+          "piccadilly" => [],
+          "bakerloo" => [],
+          "central" => [],
+          "circle" => [],
+          "district" => [],
+          "hammersmith-city" => [],
+          "jubilee" => [],
+          "metropolitan" => [],
+          "victoria" => [],
+          "waterloo-city" => []
+        }
+    url = "https://api.tfl.gov.uk/Line/Mode/tube/Status?detail=true&app_id=7f2f48f4&app_key=0e1550125ac29794e46fe13c38722cf8"
+    response_string = RestClient.get(url)
+    response_hash = JSON.parse(response_string)
+    stations_arr = []
+    disruptions_hash.each do |line, stations|
+      disruptions_hash[line] << response_hash.select{|l| l["id"]==line}
+        .map{|tfl| tfl["lineStatuses"]}.flatten[0]["statusSeverityDescription"]
+        disruptions_hash[line] << response_hash.select{|l| l["id"]==line}
+          .map{|tfl| tfl["lineStatuses"]}.flatten[0]["statusSeverity"]
+        end
+    disruptions_hash.each do|line,dis|
+      print "#{colour_lines Line.find_by(tfl_id: line).name} line has "
+      if dis[1] < 10 && dis[1] >= 5
+        puts Rainbow("#{dis[0].upcase}").black.bg("dbba30").blink
+      elsif dis[1] < 5
+        puts Rainbow("#{dis[0].upcase}").red.bg("cdccd8").blink
+      else puts "#{dis[0].upcase}"
+      end
     end
   end
 end
