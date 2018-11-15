@@ -9,21 +9,22 @@ class CommandLineInterface
   def greet
     hello = Artii::Base.new :font => 'slant'
     puts hello.asciify("Mind the Gap")
-    40.times do print "\u{1F687}" end
+    60.times do print "\u{1F687} " end
     puts ""
   end
 
    def intro
-     puts "Select a number from 1 - 7"
+     puts "Select a number from 1 - 9"
      puts "---------------------------"
-     puts Rainbow("1|").blue.bright + " What stations are on a line?"
-     puts Rainbow("2|").blue.bright + " What lines does a station belong to?"
-     puts Rainbow("3|").blue.bright + " Stations with the most lines"
-     puts Rainbow("4|").blue.bright + " Stations with the least lines"
-     puts Rainbow("5|").blue.bright + " Lines with the most stations"
-     puts Rainbow("6|").blue.bright + " Lines with the least stations"
+     puts Rainbow("1|").blue.bright + " What stations are on a **Tube Line**?"
+     puts Rainbow("2|").blue.bright + " What lines does a **Tube Station** belong to?"
+     puts Rainbow("3|").blue.bright + " What **Tube Stations** have the most Lines"
+     puts Rainbow("4|").blue.bright + " What **Tube Stations** with the least Lines"
+     puts Rainbow("5|").blue.bright + " **Tube Lines** with the most Stations"
+     puts Rainbow("6|").blue.bright + " **Tube Lines** with the least stations"
      puts Rainbow("7|").blue.bright + " View Disruptions"
-     puts Rainbow("8|").blue.bright + " To exit"
+     puts Rainbow("8|").blue.bright + " Clear Screen"
+     puts Rainbow("9|").blue.bright + " To Exit"
   end
 
    def menu_setting
@@ -52,11 +53,14 @@ class CommandLineInterface
         when "7"
           disruptions
         when "8"
+          puts `clear`
+          intro
+        when "9"
           goodbye = Artii::Base.new :font => 'slant'
           puts goodbye.asciify("Have a Safe Journey")
           break
           else
-          puts "Please select a number from 1 - 8"
+          puts "That option does not exist. Please select a number from 1 - \u{0039} "
       end
     end
    end
@@ -70,15 +74,19 @@ class CommandLineInterface
     search_results = []
     search_results = Station.where("name like ?", "#{station_name}%").map{|s| s.name}
     if search_results.length == 0
-      puts "SORRY! We could not find that station, please try again."
+      puts "\u{1F689} SORRY! We could not find that station, please try again. \u{1F689} "
       station = gets.chomp
       station = station.split.map(&:capitalize).join(' ')
       find_lines(station)
     else
       lines = Station.find_by(name: "#{search_results[0]}").lines
-      puts "#{search_results[0]} is on the following #{lines.length} line(s):"
+      puts "\u{1F689} #{search_results[0]} is on the following #{lines.length} line(s): \u{1F689} "
       lines.map{|l| puts colour_lines l.name.split.map(&:capitalize).join(' ')}
+      40.times do print "\u{1F687} " end
+        puts "\n\n\n"
+      intro
     end
+
   end
 
 
@@ -87,39 +95,54 @@ class CommandLineInterface
     search_results = []
     search_results = Line.where("name like ?", "#{line_name}%").map{|l| l.name}
     if search_results.length == 0
-      puts "SORRY! We could not find that line, please try again."
+      puts "\u{1F689} SORRY! We could not find that line, please try again. \u{1F689} "
       line = gets.chomp
       line = line.split.map(&:capitalize).join(' ')
       find_stations(line)
     else
       Line.find_by(name: "#{search_results[0]}").stations
       stops = Line.find_by(name: "#{search_results[0]}").stations
-      puts "#{colour_lines search_results[0]} line has the following #{stops.length} station(s):"
+      puts "\u{1F689}  #{colour_lines search_results[0]} line has the following #{stops.length} station(s): \u{1F689} "
       stops.map{|s| puts s.name.split.map(&:capitalize).join(' ')}
       puts "#{stops.length} station(s) on the #{colour_lines search_results[0]} line!"
+      40.times do print "\u{1F687} " end
+        puts "\n\n\n"
+      intro
     end
   end
 
   def most_lines
     max_num = Station.all.group_by{|s| s.lines.count}.keys.max
     most_lines = Station.all.group_by{|s| s.lines.count}[max_num].map{|s| s.name}
-    puts "#{most_lines.sample(5).join(", ")} has #{max_num} lines"
+    puts "\u{1F689}  #{most_lines.sample(5).join(", ")} has #{max_num} lines. \u{1F689}  "
+    40.times do print "\u{1F687} " end
+      puts "\n\n\n"
+    intro
   end
 
   def least_lines
     min_num = Station.all.group_by{|s| s.lines.count}.keys.min
     least_lines = Station.all.group_by{|s| s.lines.count}[min_num].map{|s| s.name}
-    puts "There are #{least_lines.count} stations with just one line."
+    puts "\u{1F689}  There are #{least_lines.count} stations with just one line. \u{1F689}  "
     puts "Here is a random list of 5 of them: "
     puts "#{least_lines.sample(5).join(", ")}"
+    40.times do print "\u{1F687} " end
+      puts "\n\n\n"
+    intro
   end
 
   def most_stations
-    puts "#{colour_lines Line.find_by(id: Stop.group(:line_id).count.max_by{|k,v| v}[0]).name} line has the most stations."
+    puts "\u{1F689}  #{colour_lines Line.find_by(id: Stop.group(:line_id).count.max_by{|k,v| v}[0]).name} line has the most stations. \u{1F689}  "
+    40.times do print "\u{1F687} " end
+    puts "\n\n\n"
+    intro
   end
 
   def least_stations
-    puts "#{colour_lines Line.find_by(id: Stop.group(:line_id).count.min_by{|k,v| v}[0]).name} line has the least stations."
+    puts "\u{1F689}  #{colour_lines Line.find_by(id: Stop.group(:line_id).count.min_by{|k,v| v}[0]).name} line has the least stations. \u{1F689}  "
+    40.times do print "\u{1F687} " end
+    puts "\n\n\n"
+    intro
   end
 
   def get_tfl_line_ids
@@ -182,5 +205,9 @@ class CommandLineInterface
       else puts "#{dis[0].upcase}"
       end
     end
+    40.times do print "\u{1F687} " end
+    puts "\n\n\n"
+    intro
   end
+
 end
