@@ -33,6 +33,7 @@ def populate_stations
   station_set = station_arr.to_set
 
   station_set.each do |station|
+    Station.create(name: "#{station}")
   end
 end
 
