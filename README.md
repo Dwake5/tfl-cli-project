@@ -33,6 +33,7 @@ The main stretch goals are:
 
 ### Super Stretchy Goal:
 1. :bulb: Incorporate DLR and Overground data. :construction:
+2. Clean up the code. :scream: :sob: :construction:
 
 
 ### Gems Used:
