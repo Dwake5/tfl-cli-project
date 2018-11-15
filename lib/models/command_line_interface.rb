@@ -18,11 +18,11 @@ class CommandLineInterface
      puts "---------------------------"
      puts Rainbow("1|").blue.bright + " What stations are on a **Tube Line**?"
      puts Rainbow("2|").blue.bright + " What lines does a **Tube Station** belong to?"
-     puts Rainbow("3|").blue.bright + " What **Tube Stations** have the most Lines"
-     puts Rainbow("4|").blue.bright + " What **Tube Stations** with the least Lines"
-     puts Rainbow("5|").blue.bright + " **Tube Lines** with the most Stations"
-     puts Rainbow("6|").blue.bright + " **Tube Lines** with the least stations"
-     puts Rainbow("7|").blue.bright + " View Disruptions"
+     puts Rainbow("3|").blue.bright + " What **Tube Stations** have the most Lines?"
+     puts Rainbow("4|").blue.bright + " What **Tube Stations** have the least Lines?"
+     puts Rainbow("5|").blue.bright + " What **Tube Lines** have the most Stations?"
+     puts Rainbow("6|").blue.bright + " What **Tube Lines** have  the least stations?"
+     puts Rainbow("7|").blue.bright + " View Service Status for all Tube Lines"
      puts Rainbow("8|").blue.bright + " Clear Screen"
      puts Rainbow("9|").blue.bright + " To Exit"
   end
@@ -123,9 +123,9 @@ class CommandLineInterface
   def least_lines
     min_num = Station.all.group_by{|s| s.lines.count}.keys.min
     least_lines = Station.all.group_by{|s| s.lines.count}[min_num].map{|s| s.name}
-    puts "\u{1F689}  There are #{least_lines.count} stations with just one line. \u{1F689}  "
-    puts "Here is a random list of 5 of them: "
-    puts "#{least_lines.sample(5).join(", ")}"
+    puts "\u{1F689}  There are #{least_lines.count} stations with just ONE line. \u{1F689}  "
+    puts "Here is a random list of 5 of them:"
+    puts "\u{1F689}  #{least_lines.sample(5).join("\n \u{1F689}  ")}"
     40.times do print "\u{1F687} " end
       puts "\n\n\n"
     intro
