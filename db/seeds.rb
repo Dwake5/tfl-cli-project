@@ -9,17 +9,17 @@ Station.destroy_all
 Stop.destroy_all
 
 
-piccadilly = Line.create(tfl_id: "piccadilly", name: "Piccadilly", colour: "003688")
-northern = Line.create(tfl_id: "northern", name: "Northern", colour: "000000")
-central = Line.create(tfl_id: "bakerloo", name: "Bakerloo", colour: "B36305")
-central = Line.create(tfl_id: "central", name: "Central", colour: "E32017")
-central = Line.create(tfl_id: "circle", name: "Circle", colour: "FFD300")
-central = Line.create(tfl_id: "district", name: "District", colour: "00782A")
-central = Line.create(tfl_id: "hammersmith-city", name: "Hammersmith & City", colour: "F3A9BB")
-central = Line.create(tfl_id: "jubilee", name: "Jubilee", colour: "A0A5A9")
-central = Line.create(tfl_id: "metropolitan", name: "Metropolitan", colour: "9B0056")
-central = Line.create(tfl_id: "victoria", name: "Victoria", colour: "0098D4")
-central = Line.create(tfl_id: "waterloo-city", name: "Waterloo & City", colour: "95CDBA")
+Line.create(tfl_id: "piccadilly", name: "Piccadilly", colour: "003688")
+Line.create(tfl_id: "northern", name: "Northern", colour: "000000")
+Line.create(tfl_id: "bakerloo", name: "Bakerloo", colour: "B36305")
+Line.create(tfl_id: "central", name: "Central", colour: "E32017")
+Line.create(tfl_id: "circle", name: "Circle", colour: "FFD300")
+Line.create(tfl_id: "district", name: "District", colour: "00782A")
+Line.create(tfl_id: "hammersmith-city", name: "Hammersmith & City", colour: "F3A9BB")
+Line.create(tfl_id: "jubilee", name: "Jubilee", colour: "A0A5A9")
+Line.create(tfl_id: "metropolitan", name: "Metropolitan", colour: "9B0056")
+Line.create(tfl_id: "victoria", name: "Victoria", colour: "0098D4")
+Line.create(tfl_id: "waterloo-city", name: "Waterloo & City", colour: "95CDBA")
 
 
 
