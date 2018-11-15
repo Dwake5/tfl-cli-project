@@ -79,7 +79,7 @@ class CommandLineInterface
       station = station.split.map(&:capitalize).join(' ')
       find_lines(station)
     else
-      puts "****************************"
+      puts "********************************"
       puts "WE FOUND THE FOLLOWING STATIONS:"
       puts "--------------------------------"
       puts "#{search_results.map{|r| r}.join("\n")}"
@@ -214,7 +214,7 @@ class CommandLineInterface
         end
     disruptions_hash.each do|line,dis|
       puts "************************************"
-      print "#{colour_lines Line.find_by(tfl_id: line).name} line has "
+      print "#{colour_lines Line.find_by(tfl_id: line).name} line:"
       if dis[1] < 10 && dis[1] >= 5
         puts Rainbow("#{dis[0].upcase}").black.bg("dbba30").blink
       elsif dis[1] < 5
@@ -227,5 +227,4 @@ class CommandLineInterface
     puts "\n **************************** \n\n\n"
     intro
   end
-
 end
