@@ -16,15 +16,15 @@ class CommandLineInterface
    def intro
      puts "Select a number from 1 - 9"
      puts "---------------------------"
-     puts Rainbow("1|").blue.bright + " What stations are on a **Tube Line**?"
-     puts Rainbow("2|").blue.bright + " What lines does a **Tube Station** belong to?"
-     puts Rainbow("3|").blue.bright + " What **Tube Stations** have the most Lines?"
-     puts Rainbow("4|").blue.bright + " What **Tube Stations** have the least Lines?"
-     puts Rainbow("5|").blue.bright + " What **Tube Lines** have the most Stations?"
-     puts Rainbow("6|").blue.bright + " What **Tube Lines** have  the least stations?"
-     puts Rainbow("7|").blue.bright + " View Service Status for all Tube Lines"
-     puts Rainbow("8|").blue.bright + " Clear Screen"
-     puts Rainbow("9|").blue.bright + " To Exit"
+     puts Rainbow(" 1 ").black.underline.bg(:yellow) + " Provide a **Tube Line** to view all Stations on that line."
+     puts Rainbow(" 2 ").black.underline.bg(:yellow) + " Provide a **Tube Station** to view all the Lines at that Station."
+     puts Rainbow(" 3 ").black.underline.bg(:yellow) + " View **Tube Stations** with the most Lines."
+     puts Rainbow(" 4 ").black.underline.bg(:yellow) + " View **Tube Stations** with the least Lines."
+     puts Rainbow(" 5 ").black.underline.bg(:yellow) + " View **Tube Lines** with the most Stations."
+     puts Rainbow(" 6 ").black.underline.bg(:yellow) + " View **Tube Lines** with  the least Stations."
+     puts Rainbow(" 7 ").black.underline.bg(:yellow) + " View **Service Status** for all Tube Lines"
+     puts Rainbow(" 8 ").black.underline.bg(:yellow) + " Clear Screen"
+     puts Rainbow(" 9 ").black.underline.bg(:yellow) + " To Exit"
   end
 
    def menu_setting
@@ -60,7 +60,7 @@ class CommandLineInterface
           puts goodbye.asciify("Have a Safe Journey")
           break
           else
-          puts "That option does not exist. Please select a number from 1 - \u{0039} "
+          puts "That option does not exist. Please select a number from 1 - 9 "
       end
     end
    end
@@ -214,7 +214,7 @@ class CommandLineInterface
         end
     disruptions_hash.each do|line,dis|
       puts "************************************"
-      print "#{colour_lines Line.find_by(tfl_id: line).name} line:"
+      print "#{colour_lines Line.find_by(tfl_id: line).name}: "
       if dis[1] < 10 && dis[1] >= 5
         puts Rainbow("#{dis[0].upcase}").black.bg("dbba30").blink
       elsif dis[1] < 5
