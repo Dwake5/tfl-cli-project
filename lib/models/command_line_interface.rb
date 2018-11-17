@@ -192,6 +192,7 @@ class CommandLineInterface
     disruptions_hash =
         {
           "piccadilly" => [],
+          "northern" => [],
           "bakerloo" => [],
           "central" => [],
           "circle" => [],
